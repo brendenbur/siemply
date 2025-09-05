@@ -95,8 +95,18 @@ app.include_router(audit.router, prefix="/api/audit", tags=["audit"])
 app.include_router(health.router, prefix="/api/health", tags=["health"])
 app.include_router(websocket.router, prefix="/api/ws", tags=["websocket"])
 
-# Mount static files
-app.mount("/static", StaticFiles(directory="web/static"), name="static")
+# Mount static files (only if directory exists)
+import os
+if os.path.exists("web/static"):
+    app.mount("/static", StaticFiles(directory="web/static"), name="static")
+elif os.path.exists("web/build/static"):
+    app.mount("/static", StaticFiles(directory="web/build/static"), name="static")
+else:
+    # Create a dummy static mount for development
+    from fastapi.responses import PlainTextResponse
+    @app.get("/static/{file_path:path}")
+    async def dummy_static(file_path: str):
+        return PlainTextResponse("Static files not available", status_code=404)
 
 # Serve React app
 @app.get("/", response_class=HTMLResponse)
