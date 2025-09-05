@@ -28,6 +28,7 @@ echo "✅ Python version $python_version is compatible"
 if [ -d "venv" ]; then
     echo "🔧 Activating virtual environment..."
     source venv/bin/activate
+    echo "✅ Virtual environment activated"
 else
     echo "⚠️  Virtual environment not found. Using system Python..."
 fi
@@ -35,6 +36,12 @@ fi
 # Install/update dependencies
 echo "📦 Installing/updating dependencies..."
 pip install -e . > /dev/null 2>&1
+
+# Verify uvicorn is available
+if ! command -v uvicorn &> /dev/null; then
+    echo "❌ uvicorn not found. Installing..."
+    pip install uvicorn
+fi
 
 # Check if web build exists
 if [ -d "web/build" ]; then
@@ -56,8 +63,8 @@ echo "   Web Interface: http://localhost:8000"
 echo "   API Docs: http://localhost:8000/docs"
 echo ""
 
-# Start with uvicorn
-uvicorn siemply.api.main:app \
+# Start with uvicorn using Python module
+python3 -m uvicorn siemply.api.main:app \
     --host 0.0.0.0 \
     --port 8000 \
     --log-level info

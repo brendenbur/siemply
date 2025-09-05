@@ -10,6 +10,7 @@ src/siemply.egg-info/not-zip-safe
 src/siemply.egg-info/requires.txt
 src/siemply.egg-info/top_level.txt
 src/siemply/api/__init__.py
+src/siemply/api/dependencies.py
 src/siemply/api/main.py
 src/siemply/api/routes/__init__.py
 src/siemply/api/routes/audit.py

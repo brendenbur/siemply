@@ -64,8 +64,8 @@ echo "   Web Interface: http://localhost:8000"
 echo "   API Docs: http://localhost:8000/docs"
 echo ""
 
-# Start with uvicorn
-uvicorn siemply.api.main:app \
+# Start with uvicorn using Python module
+python3 -m uvicorn siemply.api.main:app \
     --host 0.0.0.0 \
     --port 8000 \
     --reload \
