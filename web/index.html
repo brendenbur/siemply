@@ -18,6 +18,37 @@
     
     <style>
       body { font-family: 'Inter', system-ui, sans-serif; }
+      
+      /* Tab styles */
+      .tab-button {
+        @apply whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm;
+        @apply border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300;
+      }
+      
+      .tab-button.active {
+        @apply border-blue-500 text-blue-600;
+      }
+      
+      .tab-content {
+        @apply block;
+      }
+      
+      .tab-content.hidden {
+        @apply hidden;
+      }
+      
+      /* Form styles */
+      .form-input {
+        @apply block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm;
+      }
+      
+      .form-label {
+        @apply block text-sm font-medium text-gray-700;
+      }
+      
+      .form-error {
+        @apply mt-1 text-sm text-red-600;
+      }
     </style>
   </head>
   <body class="bg-gray-50">
@@ -137,17 +168,51 @@
           </div>
         </div>
 
-        <!-- Quick Actions -->
+        <!-- Navigation Tabs -->
         <div class="bg-white shadow rounded-lg mb-8">
-          <div class="px-4 py-5 sm:p-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Quick Actions</h3>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <button onclick="loadHosts()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                <svg class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <div class="border-b border-gray-200">
+            <nav class="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+              <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-button active">
+                <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm8 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1v-2z" clip-rule="evenodd"></path>
                 </svg>
-                View Hosts
+                Dashboard
               </button>
+              <button onclick="showTab('hosts')" id="tab-hosts" class="tab-button">
+                <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm8 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1v-2z" clip-rule="evenodd"></path>
+                </svg>
+                Host Management
+              </button>
+              <button onclick="showTab('runs')" id="tab-runs" class="tab-button">
+                <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                </svg>
+                Playbook Runs
+              </button>
+              <button onclick="showTab('scripts')" id="tab-scripts" class="tab-button">
+                <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+                Python Scripts
+              </button>
+            </nav>
+          </div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="content-dashboard" class="tab-content">
+          <!-- Quick Actions -->
+          <div class="bg-white shadow rounded-lg mb-8">
+            <div class="px-4 py-5 sm:p-6">
+              <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Quick Actions</h3>
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <button onclick="loadHosts()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                  <svg class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm8 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1v-2z" clip-rule="evenodd"></path>
+                  </svg>
+                  View Hosts
+                </button>
               <button onclick="loadRuns()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                 <svg class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
@@ -182,12 +247,222 @@
             </div>
           </div>
         </div>
+
+        <!-- Host Management Tab -->
+        <div id="content-hosts" class="tab-content hidden">
+          <div class="bg-white shadow rounded-lg mb-8">
+            <div class="px-4 py-5 sm:p-6">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Host Management</h3>
+                <button onclick="showAddHostForm()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                  <svg class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
+                  </svg>
+                  Add Host
+                </button>
+              </div>
+              
+              <!-- Host Filters -->
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-4 mb-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Search</label>
+                  <input type="text" id="host-search" placeholder="Search hosts..." class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Group</label>
+                  <select id="host-group-filter" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">All Groups</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Splunk Type</label>
+                  <select id="host-type-filter" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">All Types</option>
+                    <option value="uf">Universal Forwarder</option>
+                    <option value="enterprise">Enterprise</option>
+                  </select>
+                </div>
+                <div class="flex items-end">
+                  <button onclick="testHosts()" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                    <svg class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" clip-rule="evenodd"></path>
+                    </svg>
+                    Test Connectivity
+                  </button>
+                </div>
+              </div>
+
+              <!-- Hosts Table -->
+              <div class="overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Host</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP Address</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Splunk Type</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="hosts-table-body" class="bg-white divide-y divide-gray-200">
+                    <tr>
+                      <td colspan="6" class="px-6 py-4 text-center text-gray-500">Loading hosts...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Host Modal -->
+        <div id="add-host-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+          <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="hideAddHostForm()"></div>
+            
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <form id="add-host-form">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                  <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Add New Host</h3>
+                    <button type="button" onclick="hideAddHostForm()" class="text-gray-400 hover:text-gray-600">
+                      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <div class="space-y-4">
+                    <!-- Basic Information -->
+                    <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700">Host Name *</label>
+                        <input type="text" name="name" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="web-01.example.com">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700">IP Address *</label>
+                        <input type="text" name="ip" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="192.168.1.10">
+                      </div>
+                    </div>
+                    
+                    <!-- SSH Configuration -->
+                    <div class="grid grid-cols-3 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700">SSH User *</label>
+                        <input type="text" name="user" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="splunk" value="splunk">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700">SSH Port *</label>
+                        <input type="number" name="port" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="22" value="22" min="1" max="65535">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700">SSH Key File</label>
+                        <input type="text" name="key_file" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="~/.ssh/id_rsa">
+                      </div>
+                    </div>
+                    
+                    <!-- Splunk Configuration -->
+                    <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700">Splunk Type</label>
+                        <select name="splunk_type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                          <option value="uf">Universal Forwarder</option>
+                          <option value="enterprise">Enterprise</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700">Splunk Version</label>
+                        <input type="text" name="splunk_version" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="9.2.2">
+                      </div>
+                    </div>
+                    
+                    <!-- OS Configuration -->
+                    <div class="grid grid-cols-3 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700">OS Family</label>
+                        <select name="os_family" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                          <option value="RedHat">RedHat</option>
+                          <option value="Debian">Debian</option>
+                          <option value="Ubuntu">Ubuntu</option>
+                          <option value="CentOS">CentOS</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700">OS Version</label>
+                        <input type="text" name="os_version" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="8">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700">CPU Architecture</label>
+                        <select name="cpu_arch" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                          <option value="x86_64">x86_64</option>
+                          <option value="arm64">arm64</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <!-- Resources -->
+                    <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700">Memory (GB)</label>
+                        <input type="number" name="memory_gb" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="8" min="0">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700">Disk Space (GB)</label>
+                        <input type="number" name="disk_gb" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="100" min="0">
+                      </div>
+                    </div>
+                    
+                    <!-- Group -->
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700">Group</label>
+                      <input type="text" name="group" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="prod-web">
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                  <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    Add Host
+                  </button>
+                  <button type="button" onclick="hideAddHostForm()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <script>
       // API Base URL
       const API_BASE = window.location.origin;
+
+      // Tab management
+      function showTab(tabName) {
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(tab => {
+          tab.classList.add('hidden');
+        });
+        
+        // Remove active class from all tab buttons
+        document.querySelectorAll('.tab-button').forEach(button => {
+          button.classList.remove('active');
+        });
+        
+        // Show selected tab content
+        document.getElementById(`content-${tabName}`).classList.remove('hidden');
+        
+        // Add active class to selected tab button
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+        
+        // Load data for the tab
+        if (tabName === 'hosts') {
+          loadHostsTable();
+        }
+      }
 
       // Load system health data
       async function loadSystemHealth() {
@@ -203,109 +478,162 @@
         }
       }
 
-      // Load hosts
-      async function loadHosts() {
+      // Host management functions
+      async function loadHostsTable() {
         try {
           const response = await fetch(`${API_BASE}/api/hosts/`);
           const hosts = await response.json();
           
-          const content = document.getElementById('content');
-          content.innerHTML = `
-            <div class="px-4 py-5 sm:p-6">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Hosts (${hosts.length})</h3>
-              <div class="overflow-hidden">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Host</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">OS</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
-                    ${hosts.map(host => `
-                      <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${host.name}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${host.ip}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${host.splunk_type || 'Unknown'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${host.os_family} ${host.os_version}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            ${host.status || 'Unknown'}
-                          </span>
-                        </td>
-                      </tr>
-                    `).join('')}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          `;
+          const tbody = document.getElementById('hosts-table-body');
+          if (hosts.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No hosts found</td></tr>';
+            return;
+          }
+          
+          tbody.innerHTML = hosts.map(host => `
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${host.name}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${host.ip}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${host.group || '-'}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${host.splunk_type || '-'}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${host.status === 'healthy' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                  ${host.status || 'unknown'}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <button onclick="testHost('${host.name}')" class="text-blue-600 hover:text-blue-900 mr-3">Test</button>
+                <button onclick="editHost('${host.name}')" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                <button onclick="deleteHost('${host.name}')" class="text-red-600 hover:text-red-900">Delete</button>
+              </td>
+            </tr>
+          `).join('');
+          
+          // Update group filter options
+          const groups = [...new Set(hosts.map(h => h.group).filter(Boolean))];
+          const groupFilter = document.getElementById('host-group-filter');
+          groupFilter.innerHTML = '<option value="">All Groups</option>' + 
+            groups.map(group => `<option value="${group}">${group}</option>`).join('');
+          
         } catch (error) {
           console.error('Failed to load hosts:', error);
-          document.getElementById('content').innerHTML = `
-            <div class="px-4 py-5 sm:p-6">
-              <div class="text-center text-red-600">Failed to load hosts: ${error.message}</div>
-            </div>
-          `;
+          document.getElementById('hosts-table-body').innerHTML = 
+            '<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Failed to load hosts</td></tr>';
         }
       }
 
-      // Load runs
-      async function loadRuns() {
+      function showAddHostForm() {
+        document.getElementById('add-host-modal').classList.remove('hidden');
+      }
+
+      function hideAddHostForm() {
+        document.getElementById('add-host-modal').classList.add('hidden');
+        document.getElementById('add-host-form').reset();
+      }
+
+      async function testHosts() {
         try {
-          const response = await fetch(`${API_BASE}/api/runs/`);
-          const runs = await response.json();
+          const response = await fetch(`${API_BASE}/api/hosts/test`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify([]) // Test all hosts
+          });
+          const results = await response.json();
           
-          const content = document.getElementById('content');
-          content.innerHTML = `
-            <div class="px-4 py-5 sm:p-6">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Runs (${runs.length})</h3>
-              <div class="overflow-hidden">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Run ID</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hosts</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Started</th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
-                    ${runs.map(run => `
-                      <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">${run.run_id}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            run.status === 'completed' ? 'bg-green-100 text-green-800' :
-                            run.status === 'running' ? 'bg-blue-100 text-blue-800' :
-                            run.status === 'failed' ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
-                          }">
-                            ${run.status}
-                          </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${run.total_hosts || 0}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${run.duration ? run.duration.toFixed(1) + 's' : '-'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${run.start_time ? new Date(run.start_time).toLocaleString() : '-'}</td>
-                      </tr>
-                    `).join('')}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          `;
+          alert(`Test completed: ${results.filter(r => r.status === 'success').length} successful, ${results.filter(r => r.status === 'failed').length} failed`);
+          loadHostsTable(); // Refresh the table
         } catch (error) {
-          console.error('Failed to load runs:', error);
-          document.getElementById('content').innerHTML = `
-            <div class="px-4 py-5 sm:p-6">
-              <div class="text-center text-red-600">Failed to load runs: ${error.message}</div>
-            </div>
-          `;
+          console.error('Failed to test hosts:', error);
+          alert('Failed to test hosts');
         }
+      }
+
+      async function testHost(hostName) {
+        try {
+          const response = await fetch(`${API_BASE}/api/hosts/test`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify([hostName])
+          });
+          const results = await response.json();
+          
+          const result = results[0];
+          alert(`Host ${hostName}: ${result.status} - ${result.message || 'Test completed'}`);
+          loadHostsTable(); // Refresh the table
+        } catch (error) {
+          console.error('Failed to test host:', error);
+          alert('Failed to test host');
+        }
+      }
+
+      function editHost(hostName) {
+        // For now, just show an alert. In a full implementation, this would open an edit form
+        alert(`Edit host ${hostName} - Feature coming soon!`);
+      }
+
+      async function deleteHost(hostName) {
+        if (!confirm(`Are you sure you want to delete host ${hostName}?`)) {
+          return;
+        }
+        
+        try {
+          const response = await fetch(`${API_BASE}/api/hosts/${hostName}`, {
+            method: 'DELETE'
+          });
+          
+          if (response.ok) {
+            alert('Host deleted successfully');
+            loadHostsTable(); // Refresh the table
+          } else {
+            alert('Failed to delete host');
+          }
+        } catch (error) {
+          console.error('Failed to delete host:', error);
+          alert('Failed to delete host');
+        }
+      }
+
+      // Handle add host form submission
+      document.getElementById('add-host-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const hostData = Object.fromEntries(formData.entries());
+        
+        // Convert numeric fields
+        hostData.port = parseInt(hostData.port);
+        if (hostData.memory_gb) hostData.memory_gb = parseInt(hostData.memory_gb);
+        if (hostData.disk_gb) hostData.disk_gb = parseInt(hostData.disk_gb);
+        
+        try {
+          const response = await fetch(`${API_BASE}/api/hosts/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(hostData)
+          });
+          
+          if (response.ok) {
+            alert('Host added successfully');
+            hideAddHostForm();
+            loadHostsTable(); // Refresh the table
+          } else {
+            const error = await response.json();
+            alert(`Failed to add host: ${error.detail || 'Unknown error'}`);
+          }
+        } catch (error) {
+          console.error('Failed to add host:', error);
+          alert('Failed to add host');
+        }
+      });
+
+      // Load hosts (legacy function - now redirects to hosts tab)
+      async function loadHosts() {
+        showTab('hosts');
+      }
+
+      // Load runs (legacy function - now redirects to runs tab)
+      async function loadRuns() {
+        showTab('runs');
       }
 
       // Load health
