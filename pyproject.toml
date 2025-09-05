@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "siemply"
+version = "1.0.0"
+description = "A lightweight, opinionated orchestration framework for managing Splunk deployments"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Siemply Framework", email = "support@siemply.dev"}
+]
+keywords = ["splunk", "orchestration", "automation", "infrastructure", "deployment"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Systems Administration",
+    "Topic :: System :: Clustering",
+    "Topic :: System :: Monitoring",
+]
+dependencies = [
+    "click>=8.0.0",
+    "pyyaml>=6.0",
+    "asyncssh>=2.13.0",
+    "cryptography>=41.0.0",
+]
+
+[project.optional-dependencies]
+vault = ["hvac>=1.0.0"]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+]
+
+[project.scripts]
+siemply = "siemply.cli.main:main"
+
+[project.urls]
+Homepage = "https://github.com/siemply/siemply"
+Documentation = "https://docs.siemply.dev"
+Repository = "https://github.com/siemply/siemply"
+Issues = "https://github.com/siemply/siemply/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+siemply = [
+    "config/*.yml",
+    "config/*.yaml", 
+    "plays/*.yml",
+    "plays/*.yaml",
+    "scripts/*.py",
+]
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true

@@ -3,7 +3,6 @@ click>=8.0.0
 pyyaml>=6.0
 asyncssh>=2.13.0
 cryptography>=41.0.0
-sqlite3  # Built-in with Python 3.11+
 
 # Optional dependencies for enhanced functionality
 # hvac>=1.0.0  # For HashiCorp Vault support

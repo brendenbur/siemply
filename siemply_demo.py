@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Siemply PoC - Splunk Infrastructure Orchestration Framework
-Demonstrates: inventory load → prechecks → rolling UF upgrade → postchecks → Markdown report
+Siemply Demo - Simple demonstration of the framework capabilities
+This is a standalone demo that doesn't require the full package installation
 """
 
 import asyncio
@@ -14,39 +14,14 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 
-# Add src to path for imports
-sys.path.insert(0, str(Path(__file__).parent / 'src'))
 
-try:
-    from siemply.core.orchestrator import Orchestrator, RunConfig
-    from siemply.core.inventory import Inventory
-    from siemply.core.ssh_executor import SSHExecutor
-    from siemply.core.secrets import SecretsManager
-    from siemply.core.audit import AuditLogger
-except ImportError:
-    # Fallback to direct imports if package not installed
-    from src.siemply.core.orchestrator import Orchestrator, RunConfig
-    from src.siemply.core.inventory import Inventory
-    from src.siemply.core.ssh_executor import SSHExecutor
-    from src.siemply.core.secrets import SecretsManager
-    from src.siemply.core.audit import AuditLogger
-
-
-class SiemplyPoC:
-    """Siemply Proof of Concept"""
+class SiemplyDemo:
+    """Siemply Demo - Simplified demonstration"""
     
-    def __init__(self, config_dir: str = "config"):
-        self.config_dir = config_dir
+    def __init__(self):
         self.logger = logging.getLogger(__name__)
         
-        # Initialize components
-        self.orchestrator = Orchestrator(config_dir)
-        self.inventory = Inventory(config_dir)
-        self.secrets = SecretsManager(config_dir)
-        self.ssh_executor = SSHExecutor(self.secrets)
-        self.audit = AuditLogger(config_dir)
-        
-        # Results storage
+        # Demo results
         self.results = {
             'start_time': None,
             'end_time': None,
@@ -57,21 +32,12 @@ class SiemplyPoC:
             'warnings': []
         }
     
-    async def initialize(self):
-        """Initialize Siemply components"""
-        try:
-            await self.orchestrator.initialize()
-            self.logger.info("Siemply PoC initialized successfully")
-        except Exception as e:
-            self.logger.error(f"Failed to initialize Siemply PoC: {e}")
-            raise
-    
     async def run_demo(self, target_group: str = "prod-web", target_version: str = "9.2.2"):
         """Run the complete demo workflow"""
         self.results['start_time'] = datetime.now()
         
         try:
-            self.logger.info("🚀 Starting Siemply PoC Demo")
+            self.logger.info("🚀 Starting Siemply Demo")
             self.logger.info(f"Target Group: {target_group}")
             self.logger.info(f"Target Version: {target_version}")
             
@@ -93,10 +59,10 @@ class SiemplyPoC:
             self.results['end_time'] = datetime.now()
             self.results['duration'] = (self.results['end_time'] - self.results['start_time']).total_seconds()
             
-            self.logger.info("✅ Siemply PoC Demo completed successfully")
+            self.logger.info("✅ Siemply Demo completed successfully")
             
         except Exception as e:
-            self.logger.error(f"❌ Siemply PoC Demo failed: {e}")
+            self.logger.error(f"❌ Siemply Demo failed: {e}")
             self.results['errors'].append(str(e))
             raise
     
@@ -106,28 +72,26 @@ class SiemplyPoC:
         self.logger.info(f"📋 Phase 1: Loading inventory for group '{target_group}'")
         
         try:
-            # Load inventory
-            await self.inventory.load()
-            
-            # Get target hosts
-            hosts = self.inventory.get_group_hosts(target_group)
-            if not hosts:
-                raise ValueError(f"No hosts found in group '{target_group}'")
+            # Simulate inventory loading
+            hosts = [
+                {'name': 'web-01', 'ip': '192.168.1.10', 'splunk_type': 'uf', 'version': '9.1.2'},
+                {'name': 'web-02', 'ip': '192.168.1.11', 'splunk_type': 'uf', 'version': '9.1.2'},
+                {'name': 'web-03', 'ip': '192.168.1.12', 'splunk_type': 'uf', 'version': '9.1.2'},
+            ]
             
             self.results['phases'][phase_name] = {
                 'status': 'success',
                 'hosts_found': len(hosts),
-                'hosts': [h.name for h in hosts]
+                'hosts': [h['name'] for h in hosts]
             }
             
             self.logger.info(f"✅ Found {len(hosts)} hosts in group '{target_group}'")
             
             # Store hosts for later phases
-            self.results['hosts'] = {h.name: {
-                'ansible_host': h.ansible_host,
-                'splunk_type': h.splunk_type,
-                'splunk_version': h.splunk_version,
-                'os_family': h.os_family,
+            self.results['hosts'] = {h['name']: {
+                'ip': h['ip'],
+                'splunk_type': h['splunk_type'],
+                'version': h['version'],
                 'status': 'pending'
             } for h in hosts}
             
@@ -142,37 +106,36 @@ class SiemplyPoC:
         self.logger.info(f"🔍 Phase 2: Running pre-upgrade checks")
         
         try:
-            hosts = self.inventory.get_group_hosts(target_group)
             precheck_results = {}
             
-            for host in hosts:
-                self.logger.info(f"  Checking {host.name} ({host.ansible_host})...")
+            for host_name, host_data in self.results['hosts'].items():
+                self.logger.info(f"  Checking {host_name} ({host_data['ip']})...")
                 
-                # Simulate prechecks (in real implementation, these would be actual checks)
+                # Simulate prechecks
                 host_checks = {
-                    'disk_space': self._simulate_check('disk_space', host),
-                    'memory': self._simulate_check('memory', host),
-                    'ulimits': self._simulate_check('ulimits', host),
-                    'selinux': self._simulate_check('selinux', host),
-                    'ports': self._simulate_check('ports', host),
-                    'python': self._simulate_check('python', host)
+                    'disk_space': self._simulate_check('disk_space'),
+                    'memory': self._simulate_check('memory'),
+                    'ulimits': self._simulate_check('ulimits'),
+                    'selinux': self._simulate_check('selinux'),
+                    'ports': self._simulate_check('ports'),
+                    'python': self._simulate_check('python')
                 }
                 
                 # Determine overall status
                 all_passed = all(check['status'] == 'PASS' for check in host_checks.values())
                 host_status = 'PASS' if all_passed else 'FAIL'
                 
-                precheck_results[host.name] = {
+                precheck_results[host_name] = {
                     'status': host_status,
                     'checks': host_checks
                 }
                 
-                self.results['hosts'][host.name]['precheck_status'] = host_status
+                self.results['hosts'][host_name]['precheck_status'] = host_status
                 
                 if host_status == 'PASS':
-                    self.logger.info(f"    ✅ {host.name} - All prechecks passed")
+                    self.logger.info(f"    ✅ {host_name} - All prechecks passed")
                 else:
-                    self.logger.warning(f"    ⚠️ {host.name} - Some prechecks failed")
+                    self.logger.warning(f"    ⚠️ {host_name} - Some prechecks failed")
             
             self.results['phases'][phase_name] = {
                 'status': 'success',
@@ -190,9 +153,9 @@ class SiemplyPoC:
         self.logger.info(f"🔄 Phase 3: Rolling UF upgrade to version {target_version}")
         
         try:
-            hosts = self.inventory.get_group_hosts(target_group)
+            hosts = list(self.results['hosts'].keys())
             batch_size = 2  # Simulate small batches
-            batch_delay = 5  # 5 seconds between batches
+            batch_delay = 2  # 2 seconds between batches
             
             upgrade_results = {}
             
@@ -204,8 +167,9 @@ class SiemplyPoC:
                 self.logger.info(f"  Processing batch {batch_num}: {len(batch)} hosts")
                 
                 # Process batch
-                for host in batch:
-                    self.logger.info(f"    Upgrading {host.name} ({host.ansible_host})...")
+                for host_name in batch:
+                    host_data = self.results['hosts'][host_name]
+                    self.logger.info(f"    Upgrading {host_name} ({host_data['ip']})...")
                     
                     # Simulate upgrade steps
                     upgrade_steps = [
@@ -232,7 +196,7 @@ class SiemplyPoC:
                         self.logger.info(f"      {step_desc}...")
                         
                         # Simulate step execution
-                        step_result = self._simulate_upgrade_step(step_name, host, target_version)
+                        step_result = self._simulate_upgrade_step(step_name, target_version)
                         
                         host_upgrade['steps'][step_name] = {
                             'description': step_desc,
@@ -247,19 +211,19 @@ class SiemplyPoC:
                             break
                         
                         # Simulate step duration
-                        await asyncio.sleep(0.5)
+                        await asyncio.sleep(0.3)
                     
                     step_end = time.time()
                     host_upgrade['end_time'] = datetime.now().isoformat()
                     host_upgrade['duration'] = step_end - step_start
                     
-                    upgrade_results[host.name] = host_upgrade
-                    self.results['hosts'][host.name]['upgrade_status'] = host_upgrade['status']
+                    upgrade_results[host_name] = host_upgrade
+                    self.results['hosts'][host_name]['upgrade_status'] = host_upgrade['status']
                     
                     if host_upgrade['status'] == 'success':
-                        self.logger.info(f"    ✅ {host.name} - Upgrade completed successfully")
+                        self.logger.info(f"    ✅ {host_name} - Upgrade completed successfully")
                     else:
-                        self.logger.error(f"    ❌ {host.name} - Upgrade failed: {host_upgrade.get('error', 'Unknown error')}")
+                        self.logger.error(f"    ❌ {host_name} - Upgrade failed: {host_upgrade.get('error', 'Unknown error')}")
                 
                 # Wait between batches (except for last batch)
                 if i + batch_size < len(hosts):
@@ -282,37 +246,36 @@ class SiemplyPoC:
         self.logger.info(f"✅ Phase 4: Running post-upgrade validation")
         
         try:
-            hosts = self.inventory.get_group_hosts(target_group)
             postcheck_results = {}
             
-            for host in hosts:
-                self.logger.info(f"  Validating {host.name} ({host.ansible_host})...")
+            for host_name, host_data in self.results['hosts'].items():
+                self.logger.info(f"  Validating {host_name} ({host_data['ip']})...")
                 
                 # Simulate postchecks
                 host_checks = {
-                    'service_status': self._simulate_check('service_status', host),
-                    'version_check': self._simulate_check('version_check', host),
-                    'port_check': self._simulate_check('port_check', host),
-                    'health_check': self._simulate_check('health_check', host),
-                    'connectivity_check': self._simulate_check('connectivity_check', host)
+                    'service_status': self._simulate_check('service_status'),
+                    'version_check': self._simulate_check('version_check'),
+                    'port_check': self._simulate_check('port_check'),
+                    'health_check': self._simulate_check('health_check'),
+                    'connectivity_check': self._simulate_check('connectivity_check')
                 }
                 
                 # Determine overall status
                 all_passed = all(check['status'] == 'PASS' for check in host_checks.values())
                 host_status = 'PASS' if all_passed else 'FAIL'
                 
-                postcheck_results[host.name] = {
+                postcheck_results[host_name] = {
                     'status': host_status,
                     'checks': host_checks
                 }
                 
-                self.results['hosts'][host.name]['postcheck_status'] = host_status
-                self.results['hosts'][host.name]['status'] = 'completed' if host_status == 'PASS' else 'failed'
+                self.results['hosts'][host_name]['postcheck_status'] = host_status
+                self.results['hosts'][host_name]['status'] = 'completed' if host_status == 'PASS' else 'failed'
                 
                 if host_status == 'PASS':
-                    self.logger.info(f"    ✅ {host.name} - All postchecks passed")
+                    self.logger.info(f"    ✅ {host_name} - All postchecks passed")
                 else:
-                    self.logger.warning(f"    ⚠️ {host.name} - Some postchecks failed")
+                    self.logger.warning(f"    ⚠️ {host_name} - Some postchecks failed")
             
             self.results['phases'][phase_name] = {
                 'status': 'success',
@@ -338,7 +301,7 @@ class SiemplyPoC:
             report_content = self._generate_markdown_report()
             
             # Save report
-            report_file = reports_dir / f"siemply_poc_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+            report_file = reports_dir / f"siemply_demo_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
             report_file.write_text(report_content)
             
             self.results['phases'][phase_name] = {
@@ -353,21 +316,17 @@ class SiemplyPoC:
             self.results['phases'][phase_name] = {'status': 'failed', 'error': str(e)}
             raise
     
-    def _simulate_check(self, check_type: str, host) -> Dict[str, Any]:
+    def _simulate_check(self, check_type: str) -> Dict[str, Any]:
         """Simulate a health check"""
         # Simulate different check results based on check type
-        if check_type in ['disk_space', 'memory', 'ulimits', 'python']:
+        if check_type in ['disk_space', 'memory', 'ulimits', 'python', 'service_status', 'version_check', 'port_check', 'health_check', 'connectivity_check']:
             return {'status': 'PASS', 'output': f'{check_type} check passed'}
         elif check_type == 'selinux':
             return {'status': 'WARN', 'output': 'SELinux in permissive mode'}
-        elif check_type == 'ports':
-            return {'status': 'PASS', 'output': 'Required ports are available'}
-        elif check_type in ['service_status', 'version_check', 'port_check', 'health_check', 'connectivity_check']:
-            return {'status': 'PASS', 'output': f'{check_type} check passed'}
         else:
             return {'status': 'PASS', 'output': f'{check_type} check completed'}
     
-    def _simulate_upgrade_step(self, step_name: str, host, target_version: str) -> Dict[str, Any]:
+    def _simulate_upgrade_step(self, step_name: str, target_version: str) -> Dict[str, Any]:
         """Simulate an upgrade step"""
         # Simulate different step results
         if step_name == 'stop_service':
@@ -389,7 +348,7 @@ class SiemplyPoC:
     
     def _generate_markdown_report(self) -> str:
         """Generate Markdown report"""
-        report = f"""# Siemply PoC Demo Report
+        report = f"""# Siemply Demo Report
 
 **Generated:** {datetime.now().isoformat()}  
 **Duration:** {self.results['duration']:.2f} seconds  
@@ -424,10 +383,9 @@ class SiemplyPoC:
         for host_name, host_data in self.results['hosts'].items():
             status_emoji = "✅" if host_data.get('status') == 'completed' else "❌" if host_data.get('status') == 'failed' else "⏳"
             report += f"### {status_emoji} {host_name}\n\n"
-            report += f"**Host:** {host_data['ansible_host']}\n"
+            report += f"**IP:** {host_data['ip']}\n"
             report += f"**Splunk Type:** {host_data['splunk_type']}\n"
-            report += f"**Splunk Version:** {host_data['splunk_version']}\n"
-            report += f"**OS Family:** {host_data['os_family']}\n"
+            report += f"**Version:** {host_data['version']}\n"
             report += f"**Status:** {host_data.get('status', 'unknown')}\n"
             
             if 'precheck_status' in host_data:
@@ -472,23 +430,21 @@ async def main():
     
     # Parse command line arguments
     import argparse
-    parser = argparse.ArgumentParser(description='Siemply PoC Demo')
+    parser = argparse.ArgumentParser(description='Siemply Demo')
     parser.add_argument('--group', '-g', default='prod-web', help='Target group')
     parser.add_argument('--version', '-v', default='9.2.2', help='Target version')
-    parser.add_argument('--config-dir', '-c', default='config', help='Config directory')
     
     args = parser.parse_args()
     
-    # Create and run PoC
-    poc = SiemplyPoC(args.config_dir)
+    # Create and run demo
+    demo = SiemplyDemo()
     
     try:
-        await poc.initialize()
-        await poc.run_demo(args.group, args.version)
-        print("\n🎉 Siemply PoC Demo completed successfully!")
+        await demo.run_demo(args.group, args.version)
+        print("\n🎉 Siemply Demo completed successfully!")
         print(f"📊 Check the reports/ directory for detailed results")
     except Exception as e:
-        print(f"\n💥 Siemply PoC Demo failed: {e}")
+        print(f"\n💥 Siemply Demo failed: {e}")
         sys.exit(1)
 
 
