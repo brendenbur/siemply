@@ -54,6 +54,7 @@ A lightweight, opinionated orchestration framework for managing Splunk Universal
 
 ## 🚀 Quick Start
 
+### CLI Interface
 ```bash
 # Install Siemply
 pip install -e .
@@ -66,8 +67,22 @@ cd my-splunk-project
 python3 siemply_demo.py --group prod-web --version 9.2.2
 ```
 
+### Web Interface
+```bash
+# Install dependencies
+pip install -e .
+cd web && npm install && cd ..
+
+# Build and start web interface
+./start_web.sh
+
+# Access at http://localhost:8000
+```
+
 ## ✨ Features
 
+- **Dual Interface**: Powerful CLI + Modern Web GUI
+- **Real-time Monitoring**: Live dashboard with WebSocket updates
 - **Idempotent Operations**: Safe, repeatable upgrades and configurations
 - **Zero-Agent Architecture**: Uses standard SSH for remote execution
 - **Splunk-Optimized**: Built-in tasks for UF and Enterprise upgrades
@@ -110,6 +125,7 @@ cat reports/siemply_demo_report_*.md
 ## 📚 Documentation
 
 - [Getting Started](docs/getting-started.md) - Installation and quick start
+- [Web GUI Guide](WEB_GUI_GUIDE.md) - Complete web interface documentation
 - [CLI Examples](CLI_EXAMPLES.md) - 50+ command examples
 - [Installation Fix](INSTALLATION_FIXED.md) - Installation troubleshooting
 - [Security Hardening](docs/security.md) - Security best practices

@@ -9,6 +9,14 @@ src/siemply.egg-info/entry_points.txt
 src/siemply.egg-info/not-zip-safe
 src/siemply.egg-info/requires.txt
 src/siemply.egg-info/top_level.txt
+src/siemply/api/__init__.py
+src/siemply/api/main.py
+src/siemply/api/routes/__init__.py
+src/siemply/api/routes/audit.py
+src/siemply/api/routes/health.py
+src/siemply/api/routes/hosts.py
+src/siemply/api/routes/runs.py
+src/siemply/api/routes/websocket.py
 src/siemply/cli/__init__.py
 src/siemply/cli/commands.py
 src/siemply/cli/main.py
