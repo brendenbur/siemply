@@ -1,0 +1,171 @@
+# Siemply Inventory Configuration
+# Defines hosts, groups, and variables for orchestration
+
+all:
+  children:
+    # Production environments
+    prod:
+      children:
+        prod-web:
+          hosts:
+            web-01:
+              ansible_host: 192.168.1.10
+              ansible_user: splunk
+              ansible_ssh_private_key_file: ~/.ssh/splunk_prod
+              splunk_type: uf
+              splunk_version: 9.1.2
+              os_family: RedHat
+              os_version: "8"
+              cpu_arch: x86_64
+              memory_gb: 8
+              disk_gb: 100
+            web-02:
+              ansible_host: 192.168.1.11
+              ansible_user: splunk
+              ansible_ssh_private_key_file: ~/.ssh/splunk_prod
+              splunk_type: uf
+              splunk_version: 9.1.2
+              os_family: RedHat
+              os_version: "8"
+              cpu_arch: x86_64
+              memory_gb: 8
+              disk_gb: 100
+        prod-search:
+          hosts:
+            search-01:
+              ansible_host: 192.168.1.20
+              ansible_user: splunk
+              ansible_ssh_private_key_file: ~/.ssh/splunk_prod
+              splunk_type: enterprise
+              splunk_version: 9.1.2
+              os_family: RedHat
+              os_version: "8"
+              cpu_arch: x86_64
+              memory_gb: 32
+              disk_gb: 500
+              splunk_role: search_head
+            search-02:
+              ansible_host: 192.168.1.21
+              ansible_user: splunk
+              ansible_ssh_private_key_file: ~/.ssh/splunk_prod
+              splunk_type: enterprise
+              splunk_version: 9.1.2
+              os_family: RedHat
+              os_version: "8"
+              cpu_arch: x86_64
+              memory_gb: 32
+              disk_gb: 500
+              splunk_role: search_head
+        prod-indexer:
+          hosts:
+            idx-01:
+              ansible_host: 192.168.1.30
+              ansible_user: splunk
+              ansible_ssh_private_key_file: ~/.ssh/splunk_prod
+              splunk_type: enterprise
+              splunk_version: 9.1.2
+              os_family: RedHat
+              os_version: "8"
+              cpu_arch: x86_64
+              memory_gb: 64
+              disk_gb: 1000
+              splunk_role: indexer
+            idx-02:
+              ansible_host: 192.168.1.31
+              ansible_user: splunk
+              ansible_ssh_private_key_file: ~/.ssh/splunk_prod
+              splunk_type: enterprise
+              splunk_version: 9.1.2
+              os_family: RedHat
+              os_version: "8"
+              cpu_arch: x86_64
+              memory_gb: 64
+              disk_gb: 1000
+              splunk_role: indexer
+      
+      vars:
+        splunk_home: /opt/splunk
+        splunk_user: splunk
+        splunk_group: splunk
+        splunk_mgmt_port: 8089
+        splunk_web_port: 8000
+        splunk_forwarder_port: 9997
+        splunk_indexer_port: 8080
+        upgrade_timeout: 1800
+        health_check_timeout: 300
+        backup_retention_days: 7
+        
+    # Staging environment
+    stage:
+      children:
+        stage-all:
+          hosts:
+            stage-01:
+              ansible_host: 192.168.2.10
+              ansible_user: splunk
+              ansible_ssh_private_key_file: ~/.ssh/splunk_stage
+              splunk_type: uf
+              splunk_version: 9.2.2
+              os_family: Ubuntu
+              os_version: "22.04"
+              cpu_arch: x86_64
+              memory_gb: 4
+              disk_gb: 50
+      
+      vars:
+        splunk_home: /opt/splunk
+        splunk_user: splunk
+        splunk_group: splunk
+        upgrade_timeout: 900
+        health_check_timeout: 180
+        
+    # Development environment
+    dev:
+      children:
+        dev-all:
+          hosts:
+            dev-01:
+              ansible_host: 192.168.3.10
+              ansible_user: splunk
+              ansible_ssh_private_key_file: ~/.ssh/splunk_dev
+              splunk_type: uf
+              splunk_version: 9.2.2
+              os_family: Ubuntu
+              os_version: "22.04"
+              cpu_arch: x86_64
+              memory_gb: 2
+              disk_gb: 20
+      
+      vars:
+        splunk_home: /opt/splunk
+        splunk_user: splunk
+        splunk_group: splunk
+        upgrade_timeout: 600
+        health_check_timeout: 120
+
+  vars:
+    # Global variables
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+    ansible_ssh_retries: 3
+    ansible_ssh_timeout: 30
+    ansible_python_interpreter: /usr/bin/python3
+    
+    # Splunk global settings
+    splunk_download_base_url: "https://download.splunk.com/products"
+    splunk_package_cache_dir: "/tmp/splunk_packages"
+    splunk_backup_dir: "/opt/splunk_backups"
+    
+    # Security settings
+    ssh_cipher_preference: "aes256-gcm@openssh.com,aes128-gcm@openssh.com"
+    ssh_kex_preference: "curve25519-sha256,curve25519-sha256@libssh.org"
+    ssh_mac_preference: "hmac-sha2-256,hmac-sha2-512"
+    
+    # Rate limiting
+    max_concurrent_upgrades: 5
+    upgrade_batch_size: 10
+    upgrade_batch_delay: 300  # 5 minutes between batches
+    
+    # Monitoring
+    enable_health_checks: true
+    enable_rollback_on_failure: true
+    max_failures_before_quarantine: 3

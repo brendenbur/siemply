@@ -1,0 +1,387 @@
+# Siemply Play Configuration - Splunk Health Check
+name: "Splunk Health Check"
+description: "Comprehensive health check for Splunk Universal Forwarder and Enterprise"
+version: "1.0.0"
+author: "Siemply Framework"
+created: "2024-01-15"
+
+# Execution settings
+execution:
+  strategy: parallel
+  max_failures: 0
+  max_failures_percentage: 0
+  timeout: 1800  # 30 minutes total timeout
+  retry_attempts: 1
+  retry_delay: 30
+  exponential_backoff: false
+
+# Variables
+vars:
+  health_check_timeout: 300
+  health_check_retries: 3
+  health_check_interval: 30
+  
+  # Check settings
+  check_system_resources: true
+  check_splunk_services: true
+  check_splunk_ports: true
+  check_splunk_license: true
+  check_splunk_connectivity: true
+  check_splunk_logs: true
+  check_splunk_cluster: true
+  check_splunk_indexes: true
+  check_splunk_apps: true
+  
+  # Thresholds
+  min_disk_space_gb: 10
+  min_memory_gb: 2
+  min_cpu_usage_percent: 90
+  max_log_errors: 10
+  max_response_time_ms: 5000
+
+# Tasks
+tasks:
+  # System resource checks
+  - name: "Check system resources"
+    phase: system_check
+    when: "{{ check_system_resources }}"
+    tasks:
+      - name: "Check disk space"
+        task: command
+        args:
+          cmd: "df -h {{ splunk_home }} | awk 'NR==2 {print $4}' | sed 's/G//'"
+        register: disk_space
+        timeout: 30
+        
+      - name: "Check memory usage"
+        task: command
+        args:
+          cmd: "free -g | awk 'NR==2{printf \"%.1f\", $3/$2*100}'"
+        register: memory_usage
+        timeout: 30
+        
+      - name: "Check CPU usage"
+        task: command
+        args:
+          cmd: "top -bn1 | grep 'Cpu(s)' | awk '{print $2}' | sed 's/%us,//'"
+        register: cpu_usage
+        timeout: 30
+        
+      - name: "Check load average"
+        task: command
+        args:
+          cmd: "uptime | awk '{print $10,$11,$12}'"
+        register: load_average
+        timeout: 30
+        
+      - name: "Check file descriptors"
+        task: command
+        args:
+          cmd: "ulimit -n"
+        register: file_descriptors
+        timeout: 30
+
+  # Splunk service checks
+  - name: "Check Splunk services"
+    phase: service_check
+    when: "{{ check_splunk_services }}"
+    tasks:
+      - name: "Check Splunk daemon status"
+        task: splunk_status_check
+        args:
+          check_splunkd: true
+          check_web: true
+          check_forwarder: true
+          check_indexer: true
+        timeout: 120
+        
+      - name: "Check Splunk service status"
+        task: service
+        args:
+          name: "{{ splunk_service_name }}"
+          state: started
+        timeout: 60
+        
+      - name: "Check Splunk process health"
+        task: command
+        args:
+          cmd: "ps aux | grep splunk | grep -v grep | wc -l"
+        register: splunk_processes
+        timeout: 30
+
+  # Splunk port checks
+  - name: "Check Splunk ports"
+    phase: port_check
+    when: "{{ check_splunk_ports }}"
+    tasks:
+      - name: "Check management port"
+        task: command
+        args:
+          cmd: "netstat -tlnp | grep :{{ splunk_mgmt_port }}"
+        register: mgmt_port
+        timeout: 30
+        
+      - name: "Check web port"
+        task: command
+        args:
+          cmd: "netstat -tlnp | grep :{{ splunk_web_port }}"
+        register: web_port
+        timeout: 30
+        when: "{{ splunk_type == 'enterprise' }}"
+        
+      - name: "Check forwarder port"
+        task: command
+        args:
+          cmd: "netstat -tlnp | grep :{{ splunk_forwarder_port }}"
+        register: forwarder_port
+        timeout: 30
+        
+      - name: "Check indexer port"
+        task: command
+        args:
+          cmd: "netstat -tlnp | grep :{{ splunk_indexer_port }}"
+        register: indexer_port
+        timeout: 30
+        when: "{{ splunk_type == 'enterprise' and splunk_role == 'indexer' }}"
+
+  # Splunk license checks
+  - name: "Check Splunk license"
+    phase: license_check
+    when: "{{ check_splunk_license and splunk_type == 'enterprise' }}"
+    tasks:
+      - name: "Check license status"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk show license"
+        register: license_status
+        timeout: 60
+        
+      - name: "Check license expiration"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk show license | grep -i expiration"
+        register: license_expiration
+        timeout: 60
+        
+      - name: "Check license usage"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk show license | grep -i usage"
+        register: license_usage
+        timeout: 60
+
+  # Splunk connectivity checks
+  - name: "Check Splunk connectivity"
+    phase: connectivity_check
+    when: "{{ check_splunk_connectivity }}"
+    tasks:
+      - name: "Check management port connectivity"
+        task: command
+        args:
+          cmd: "curl -s -o /dev/null -w '%{http_code}' http://localhost:{{ splunk_mgmt_port }}/services/server/info"
+        register: mgmt_connectivity
+        timeout: 30
+        
+      - name: "Check web port connectivity"
+        task: command
+        args:
+          cmd: "curl -s -o /dev/null -w '%{http_code}' http://localhost:{{ splunk_web_port }}"
+        register: web_connectivity
+        timeout: 30
+        when: "{{ splunk_type == 'enterprise' }}"
+        
+      - name: "Check forward server connectivity"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk list forward-server"
+        register: forward_server_connectivity
+        timeout: 60
+        
+      - name: "Check indexer connectivity"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk list indexer"
+        register: indexer_connectivity
+        timeout: 60
+        when: "{{ splunk_type == 'enterprise' }}"
+
+  # Splunk log checks
+  - name: "Check Splunk logs"
+    phase: log_check
+    when: "{{ check_splunk_logs }}"
+    tasks:
+      - name: "Check for errors in splunkd.log"
+        task: command
+        args:
+          cmd: "grep -i error {{ splunk_home }}/var/log/splunk/splunkd.log | tail -20"
+        register: splunkd_errors
+        timeout: 60
+        
+      - name: "Check for warnings in splunkd.log"
+        task: command
+        args:
+          cmd: "grep -i warning {{ splunk_home }}/var/log/splunk/splunkd.log | tail -20"
+        register: splunkd_warnings
+        timeout: 60
+        
+      - name: "Check for critical errors"
+        task: command
+        args:
+          cmd: "grep -i 'critical\\|fatal\\|panic' {{ splunk_home }}/var/log/splunk/splunkd.log | tail -10"
+        register: critical_errors
+        timeout: 60
+        
+      - name: "Check log file sizes"
+        task: command
+        args:
+          cmd: "ls -lh {{ splunk_home }}/var/log/splunk/ | head -10"
+        register: log_file_sizes
+        timeout: 30
+
+  # Splunk cluster checks
+  - name: "Check Splunk cluster"
+    phase: cluster_check
+    when: "{{ check_splunk_cluster and splunk_type == 'enterprise' }}"
+    tasks:
+      - name: "Check cluster master status"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk show cluster-status"
+        register: cluster_status
+        timeout: 120
+        
+      - name: "Check cluster peer status"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk list cluster-peers"
+        register: cluster_peers
+        timeout: 120
+        
+      - name: "Check cluster bucket status"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk list cluster-buckets"
+        register: cluster_buckets
+        timeout: 120
+        
+      - name: "Check cluster replication status"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk show cluster-replication-status"
+        register: cluster_replication
+        timeout: 120
+
+  # Splunk index checks
+  - name: "Check Splunk indexes"
+    phase: index_check
+    when: "{{ check_splunk_indexes and splunk_type == 'enterprise' }}"
+    tasks:
+      - name: "Check index status"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk list indexes"
+        register: index_status
+        timeout: 120
+        
+      - name: "Check index health"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk show index-status"
+        register: index_health
+        timeout: 120
+        
+      - name: "Check index usage"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk show index-usage"
+        register: index_usage
+        timeout: 120
+
+  # Splunk app checks
+  - name: "Check Splunk apps"
+    phase: app_check
+    when: "{{ check_splunk_apps }}"
+    tasks:
+      - name: "Check app status"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk list apps"
+        register: app_status
+        timeout: 120
+        
+      - name: "Check app health"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk show app-health"
+        register: app_health
+        timeout: 120
+        
+      - name: "Check for app errors"
+        task: command
+        args:
+          cmd: "grep -i 'app.*error' {{ splunk_home }}/var/log/splunk/splunkd.log | tail -10"
+        register: app_errors
+        timeout: 60
+
+  # Performance checks
+  - name: "Check Splunk performance"
+    phase: performance_check
+    tasks:
+      - name: "Check search performance"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk search 'index=_internal | head 1' -maxout 1"
+        register: search_performance
+        timeout: 60
+        
+      - name: "Check indexing performance"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk show index-status | grep -v '^$' | wc -l"
+        register: indexing_performance
+        timeout: 60
+        
+      - name: "Check memory usage"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk show memory"
+        register: memory_usage
+        timeout: 60
+
+# Handlers
+handlers:
+  - name: "Generate health report"
+    when: "{{ task_result.success }}"
+    tasks:
+      - name: "Create health check report"
+        task: template
+        args:
+          src: "templates/health_report.md.j2"
+          dest: "/tmp/health_report_{{ inventory_hostname }}.md"
+          mode: "0644"
+        timeout: 30
+        
+      - name: "Copy health report to controller"
+        task: copy
+        args:
+          src: "/tmp/health_report_{{ inventory_hostname }}.md"
+          dest: "reports/health_{{ inventory_hostname }}_{{ ansible_date_time.epoch }}.md"
+        timeout: 30
+
+# Notifications
+notifications:
+  - name: "Health check completed"
+    when: "{{ phase == 'performance_check' and task_name == 'Check memory usage' }}"
+    type: webhook
+    config:
+      url: "{{ webhook_url }}"
+      method: POST
+      headers:
+        Content-Type: "application/json"
+      payload:
+        event: "health_check_completed"
+        host: "{{ inventory_hostname }}"
+        timestamp: "{{ ansible_date_time.iso8601 }}"
+        status: "{{ task_result.status }}"
+        splunk_type: "{{ splunk_type }}"
+        splunk_version: "{{ splunk_version }}"

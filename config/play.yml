@@ -1,0 +1,366 @@
+# Siemply Play Configuration
+# Defines tasks, handlers, and execution flow for orchestration
+
+name: "Splunk Universal Forwarder Upgrade"
+description: "Upgrade Splunk Universal Forwarder to specified version with health checks and rollback"
+version: "1.0.0"
+author: "Siemply Framework"
+created: "2024-01-15"
+
+# Execution settings
+execution:
+  strategy: rolling
+  max_failures: 3
+  max_failures_percentage: 10
+  batch_size: 10
+  batch_delay: 300  # 5 minutes between batches
+  soak_time: 600    # 10 minutes soak time before next batch
+  timeout: 3600     # 1 hour total timeout
+  retry_attempts: 3
+  retry_delay: 30
+  exponential_backoff: true
+
+# Variables
+vars:
+  target_version: "9.2.2"
+  backup_enabled: true
+  health_check_enabled: true
+  rollback_enabled: true
+  pre_upgrade_checks: true
+  post_upgrade_checks: true
+  
+  # Package settings
+  package_download_timeout: 1800
+  package_checksum_verification: true
+  package_cache_dir: "/tmp/splunk_packages"
+  
+  # Service settings
+  service_stop_timeout: 60
+  service_start_timeout: 120
+  service_restart_timeout: 180
+  
+  # Backup settings
+  backup_retention_days: 7
+  backup_compression: true
+  
+  # Health check settings
+  health_check_retries: 5
+  health_check_interval: 30
+  health_check_timeout: 300
+
+# Pre-conditions
+pre_conditions:
+  - name: "Check target version"
+    condition: "{{ target_version is defined and target_version != '' }}"
+    error_message: "Target version must be specified"
+  
+  - name: "Check host connectivity"
+    condition: "{{ ansible_host is defined and ansible_host != '' }}"
+    error_message: "Host must be reachable"
+  
+  - name: "Check Splunk installation"
+    condition: "{{ splunk_type == 'uf' }}"
+    error_message: "Host must have Splunk Universal Forwarder installed"
+
+# Tasks
+tasks:
+  # Pre-upgrade phase
+  - name: "Pre-upgrade system checks"
+    phase: pre_upgrade
+    tasks:
+      - name: "Check system requirements"
+        task: splunk_precheck
+        args:
+          check_disk_space: true
+          min_disk_space_gb: 10
+          check_memory: true
+          min_memory_gb: 2
+          check_ulimits: true
+          check_selinux: true
+          check_ports: true
+          check_python: true
+        retries: 3
+        retry_delay: 10
+        timeout: 300
+        
+      - name: "Check current Splunk version"
+        task: command
+        args:
+          cmd: "{{ splunk_home }}/bin/splunk version"
+        register: current_version
+        timeout: 30
+        
+      - name: "Validate version upgrade path"
+        task: splunk_validate_upgrade
+        args:
+          current_version: "{{ current_version.stdout }}"
+          target_version: "{{ target_version }}"
+        timeout: 60
+        
+      - name: "Check for running processes"
+        task: splunk_status_check
+        args:
+          check_splunkd: true
+          check_web: false
+          check_forwarder: true
+        timeout: 30
+        
+      - name: "Create upgrade checkpoint"
+        task: checkpoint
+        args:
+          checkpoint_name: "pre_upgrade_{{ target_version }}"
+          checkpoint_data:
+            current_version: "{{ current_version.stdout }}"
+            timestamp: "{{ ansible_date_time.iso8601 }}"
+            host: "{{ inventory_hostname }}"
+        timeout: 30
+
+  # Download phase
+  - name: "Download Splunk package"
+    phase: download
+    tasks:
+      - name: "Create package cache directory"
+        task: file
+        args:
+          path: "{{ package_cache_dir }}"
+          state: directory
+          mode: "0755"
+          owner: "{{ splunk_user }}"
+          group: "{{ splunk_group }}"
+        timeout: 30
+        
+      - name: "Download Splunk Universal Forwarder package"
+        task: splunk_download
+        args:
+          version: "{{ target_version }}"
+          package_type: "uf"
+          os_family: "{{ os_family }}"
+          os_version: "{{ os_version }}"
+          cpu_arch: "{{ cpu_arch }}"
+          download_url: "{{ splunk_download_base_url }}"
+          cache_dir: "{{ package_cache_dir }}"
+          verify_checksum: "{{ package_checksum_verification }}"
+        retries: 3
+        retry_delay: 60
+        timeout: "{{ package_download_timeout }}"
+        
+      - name: "Verify package integrity"
+        task: splunk_verify_package
+        args:
+          package_path: "{{ package_cache_dir }}/splunkforwarder-{{ target_version }}-{{ os_family }}-{{ os_version }}-{{ cpu_arch }}.rpm"
+          verify_checksum: true
+        timeout: 120
+
+  # Backup phase
+  - name: "Backup current installation"
+    phase: backup
+    when: "{{ backup_enabled }}"
+    tasks:
+      - name: "Stop Splunk service"
+        task: service
+        args:
+          name: "SplunkForwarder"
+          state: stopped
+        timeout: "{{ service_stop_timeout }}"
+        
+      - name: "Create backup of Splunk configuration"
+        task: splunk_backup
+        args:
+          backup_dir: "{{ splunk_backup_dir }}"
+          backup_name: "pre_upgrade_{{ target_version }}_{{ ansible_date_time.epoch }}"
+          include_configs: true
+          include_apps: true
+          include_users: true
+          include_indexes: false
+          compression: "{{ backup_compression }}"
+        timeout: 600
+        
+      - name: "Verify backup integrity"
+        task: splunk_verify_backup
+        args:
+          backup_path: "{{ splunk_backup_dir }}/pre_upgrade_{{ target_version }}_{{ ansible_date_time.epoch }}.tar.gz"
+        timeout: 120
+
+  # Upgrade phase
+  - name: "Install new version"
+    phase: upgrade
+    tasks:
+      - name: "Install Splunk Universal Forwarder package"
+        task: splunk_install
+        args:
+          package_path: "{{ package_cache_dir }}/splunkforwarder-{{ target_version }}-{{ os_family }}-{{ os_version }}-{{ cpu_arch }}.rpm"
+          install_method: "upgrade"
+          preserve_configs: true
+          preserve_apps: true
+          preserve_users: true
+        retries: 2
+        retry_delay: 30
+        timeout: 900
+        
+      - name: "Restore Splunk configuration"
+        task: splunk_restore_config
+        args:
+          backup_path: "{{ splunk_backup_dir }}/pre_upgrade_{{ target_version }}_{{ ansible_date_time.epoch }}.tar.gz"
+          restore_configs: true
+          restore_apps: true
+          restore_users: true
+        timeout: 300
+        
+      - name: "Set Splunk ownership and permissions"
+        task: splunk_set_permissions
+        args:
+          splunk_home: "{{ splunk_home }}"
+          splunk_user: "{{ splunk_user }}"
+          splunk_group: "{{ splunk_group }}"
+          recursive: true
+        timeout: 180
+
+  # Post-upgrade phase
+  - name: "Post-upgrade configuration and validation"
+    phase: post_upgrade
+    tasks:
+      - name: "Start Splunk service"
+        task: service
+        args:
+          name: "SplunkForwarder"
+          state: started
+          enabled: true
+        timeout: "{{ service_start_timeout }}"
+        
+      - name: "Wait for Splunk to be ready"
+        task: splunk_wait_ready
+        args:
+          splunk_home: "{{ splunk_home }}"
+          mgmt_port: "{{ splunk_mgmt_port }}"
+          timeout: "{{ health_check_timeout }}"
+          retries: "{{ health_check_retries }}"
+          interval: "{{ health_check_interval }}"
+        timeout: "{{ health_check_timeout }}"
+        
+      - name: "Verify Splunk version"
+        task: splunk_version_check
+        args:
+          expected_version: "{{ target_version }}"
+          splunk_home: "{{ splunk_home }}"
+        timeout: 60
+        
+      - name: "Run Splunk health checks"
+        task: splunk_health_check
+        args:
+          check_splunkd: true
+          check_web: false
+          check_forwarder: true
+          check_license: true
+          check_connectivity: true
+          check_logs: true
+        timeout: 300
+        
+      - name: "Create post-upgrade checkpoint"
+        task: checkpoint
+        args:
+          checkpoint_name: "post_upgrade_{{ target_version }}"
+          checkpoint_data:
+            target_version: "{{ target_version }}"
+            timestamp: "{{ ansible_date_time.iso8601 }}"
+            host: "{{ inventory_hostname }}"
+            status: "success"
+        timeout: 30
+
+# Handlers
+handlers:
+  - name: "Rollback on failure"
+    when: "{{ rollback_enabled and task_result.failed }}"
+    tasks:
+      - name: "Stop Splunk service"
+        task: service
+        args:
+          name: "SplunkForwarder"
+          state: stopped
+        timeout: 60
+        
+      - name: "Restore from backup"
+        task: splunk_restore
+        args:
+          backup_path: "{{ splunk_backup_dir }}/pre_upgrade_{{ target_version }}_{{ ansible_date_time.epoch }}.tar.gz"
+          restore_configs: true
+          restore_apps: true
+          restore_users: true
+        timeout: 600
+        
+      - name: "Start Splunk service"
+        task: service
+        args:
+          name: "SplunkForwarder"
+          state: started
+        timeout: 120
+        
+      - name: "Verify rollback success"
+        task: splunk_health_check
+        args:
+          check_splunkd: true
+          check_forwarder: true
+        timeout: 180
+
+  - name: "Cleanup on success"
+    when: "{{ task_result.success }}"
+    tasks:
+      - name: "Clean up package cache"
+        task: file
+        args:
+          path: "{{ package_cache_dir }}/splunkforwarder-{{ target_version }}-{{ os_family }}-{{ os_version }}-{{ cpu_arch }}.rpm"
+          state: absent
+        timeout: 30
+        
+      - name: "Clean up old backups"
+        task: splunk_cleanup_backups
+        args:
+          backup_dir: "{{ splunk_backup_dir }}"
+          retention_days: "{{ backup_retention_days }}"
+        timeout: 300
+
+# Notifications
+notifications:
+  - name: "Upgrade started"
+    when: "{{ phase == 'pre_upgrade' and task_name == 'Check system requirements' }}"
+    type: webhook
+    config:
+      url: "{{ webhook_url }}"
+      method: POST
+      headers:
+        Content-Type: "application/json"
+      payload:
+        event: "upgrade_started"
+        host: "{{ inventory_hostname }}"
+        version: "{{ target_version }}"
+        timestamp: "{{ ansible_date_time.iso8601 }}"
+  
+  - name: "Upgrade completed"
+    when: "{{ phase == 'post_upgrade' and task_name == 'Verify Splunk version' and task_result.success }}"
+    type: webhook
+    config:
+      url: "{{ webhook_url }}"
+      method: POST
+      headers:
+        Content-Type: "application/json"
+      payload:
+        event: "upgrade_completed"
+        host: "{{ inventory_hostname }}"
+        version: "{{ target_version }}"
+        timestamp: "{{ ansible_date_time.iso8601 }}"
+        duration: "{{ task_result.duration }}"
+  
+  - name: "Upgrade failed"
+    when: "{{ task_result.failed }}"
+    type: webhook
+    config:
+      url: "{{ webhook_url }}"
+      method: POST
+      headers:
+        Content-Type: "application/json"
+      payload:
+        event: "upgrade_failed"
+        host: "{{ inventory_hostname }}"
+        version: "{{ target_version }}"
+        timestamp: "{{ ansible_date_time.iso8601 }}"
+        error: "{{ task_result.error }}"
+        phase: "{{ task_result.phase }}"

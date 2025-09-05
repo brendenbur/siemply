@@ -1,0 +1,13 @@
+# Core dependencies
+click>=8.0.0
+pyyaml>=6.0
+asyncssh>=2.13.0
+cryptography>=41.0.0
+sqlite3  # Built-in with Python 3.11+
+
+# Optional dependencies for enhanced functionality
+# hvac>=1.0.0  # For HashiCorp Vault support
+# requests>=2.28.0  # For HTTP requests
+# jinja2>=3.1.0  # For template rendering
+# psutil>=5.9.0  # For system monitoring
+# paramiko>=3.0.0  # Alternative SSH client

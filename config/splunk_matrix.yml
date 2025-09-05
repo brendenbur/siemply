@@ -1,0 +1,325 @@
+# Splunk Compatibility Matrix
+# Defines supported operating systems, architectures, package URLs, and configuration
+
+splunk:
+  # Supported versions
+  versions:
+    "9.2.2":
+      release_date: "2024-01-15"
+      end_of_support: "2026-01-15"
+      security_updates: true
+      bug_fixes: true
+      new_features: false
+      
+    "9.1.2":
+      release_date: "2023-10-15"
+      end_of_support: "2025-10-15"
+      security_updates: true
+      bug_fixes: true
+      new_features: false
+      
+    "9.0.5":
+      release_date: "2023-07-15"
+      end_of_support: "2025-07-15"
+      security_updates: true
+      bug_fixes: true
+      new_features: false
+
+  # Universal Forwarder packages
+  universal_forwarder:
+    "9.2.2":
+      packages:
+        rhel8:
+          x86_64:
+            url: "https://download.splunk.com/products/universalforwarder/releases/9.2.2/linux/splunkforwarder-9.2.2-17e00c557dc1-linux-2.6-x86_64.rpm"
+            checksum: "sha256:abc123def456789..."
+            size_mb: 180
+            dependencies:
+              - glibc >= 2.17
+              - libgcc >= 4.8.5
+              - libstdc++ >= 4.8.5
+          aarch64:
+            url: "https://download.splunk.com/products/universalforwarder/releases/9.2.2/linux/splunkforwarder-9.2.2-17e00c557dc1-linux-2.6-aarch64.rpm"
+            checksum: "sha256:def456abc789123..."
+            size_mb: 175
+            dependencies:
+              - glibc >= 2.17
+              - libgcc >= 4.8.5
+              - libstdc++ >= 4.8.5
+        rhel7:
+          x86_64:
+            url: "https://download.splunk.com/products/universalforwarder/releases/9.2.2/linux/splunkforwarder-9.2.2-17e00c557dc1-linux-2.6-x86_64.rpm"
+            checksum: "sha256:abc123def456789..."
+            size_mb: 180
+            dependencies:
+              - glibc >= 2.17
+              - libgcc >= 4.8.5
+              - libstdc++ >= 4.8.5
+        ubuntu2004:
+          x86_64:
+            url: "https://download.splunk.com/products/universalforwarder/releases/9.2.2/linux/splunkforwarder-9.2.2-17e00c557dc1-linux-2.6-amd64.deb"
+            checksum: "sha256:ghi789jkl012345..."
+            size_mb: 185
+            dependencies:
+              - libc6 >= 2.17
+              - libgcc1 >= 1:4.8.5
+              - libstdc++6 >= 4.8.5
+          aarch64:
+            url: "https://download.splunk.com/products/universalforwarder/releases/9.2.2/linux/splunkforwarder-9.2.2-17e00c557dc1-linux-2.6-aarch64.deb"
+            checksum: "sha256:jkl012ghi345678..."
+            size_mb: 180
+            dependencies:
+              - libc6 >= 2.17
+              - libgcc1 >= 1:4.8.5
+              - libstdc++6 >= 4.8.5
+        ubuntu2204:
+          x86_64:
+            url: "https://download.splunk.com/products/universalforwarder/releases/9.2.2/linux/splunkforwarder-9.2.2-17e00c557dc1-linux-2.6-amd64.deb"
+            checksum: "sha256:ghi789jkl012345..."
+            size_mb: 185
+            dependencies:
+              - libc6 >= 2.17
+              - libgcc1 >= 1:4.8.5
+              - libstdc++6 >= 4.8.5
+          aarch64:
+            url: "https://download.splunk.com/products/universalforwarder/releases/9.2.2/linux/splunkforwarder-9.2.2-17e00c557dc1-linux-2.6-aarch64.deb"
+            checksum: "sha256:jkl012ghi345678..."
+            size_mb: 180
+            dependencies:
+              - libc6 >= 2.17
+              - libgcc1 >= 1:4.8.5
+              - libstdc++6 >= 4.8.5
+        generic:
+          x86_64:
+            url: "https://download.splunk.com/products/universalforwarder/releases/9.2.2/linux/splunkforwarder-9.2.2-17e00c557dc1-linux-2.6-x86_64.tgz"
+            checksum: "sha256:mno345pqr678901..."
+            size_mb: 190
+            dependencies: []
+          aarch64:
+            url: "https://download.splunk.com/products/universalforwarder/releases/9.2.2/linux/splunkforwarder-9.2.2-17e00c557dc1-linux-2.6-aarch64.tgz"
+            checksum: "sha256:pqr678mno901234..."
+            size_mb: 185
+            dependencies: []
+
+  # Splunk Enterprise packages
+  enterprise:
+    "9.2.2":
+      packages:
+        rhel8:
+          x86_64:
+            url: "https://download.splunk.com/products/splunk/releases/9.2.2/linux/splunk-9.2.2-17e00c557dc1-linux-2.6-x86_64.rpm"
+            checksum: "sha256:stu901vwx234567..."
+            size_mb: 1200
+            dependencies:
+              - glibc >= 2.17
+              - libgcc >= 4.8.5
+              - libstdc++ >= 4.8.5
+              - python3 >= 3.7
+          aarch64:
+            url: "https://download.splunk.com/products/splunk/releases/9.2.2/linux/splunk-9.2.2-17e00c557dc1-linux-2.6-aarch64.rpm"
+            checksum: "sha256:vwx234stu567890..."
+            size_mb: 1150
+            dependencies:
+              - glibc >= 2.17
+              - libgcc >= 4.8.5
+              - libstdc++ >= 4.8.5
+              - python3 >= 3.7
+        ubuntu2204:
+          x86_64:
+            url: "https://download.splunk.com/products/splunk/releases/9.2.2/linux/splunk-9.2.2-17e00c557dc1-linux-2.6-amd64.deb"
+            checksum: "sha256:yza567bcd890123..."
+            size_mb: 1200
+            dependencies:
+              - libc6 >= 2.17
+              - libgcc1 >= 1:4.8.5
+              - libstdc++6 >= 4.8.5
+              - python3 >= 3.7
+          aarch64:
+            url: "https://download.splunk.com/products/splunk/releases/9.2.2/linux/splunk-9.2.2-17e00c557dc1-linux-2.6-aarch64.deb"
+            checksum: "sha256:bcd890yza123456..."
+            size_mb: 1150
+            dependencies:
+              - libc6 >= 2.17
+              - libgcc1 >= 1:4.8.5
+              - libstdc++6 >= 4.8.5
+              - python3 >= 3.7
+
+  # Operating system compatibility
+  os_compatibility:
+    rhel8:
+      name: "Red Hat Enterprise Linux 8"
+      versions: ["8.0", "8.1", "8.2", "8.3", "8.4", "8.5", "8.6", "8.7", "8.8", "8.9"]
+      architectures: ["x86_64", "aarch64"]
+      package_manager: "yum"
+      service_manager: "systemd"
+      python_path: "/usr/bin/python3"
+      min_memory_gb: 2
+      min_disk_gb: 10
+      recommended_memory_gb: 8
+      recommended_disk_gb: 50
+      
+    rhel7:
+      name: "Red Hat Enterprise Linux 7"
+      versions: ["7.0", "7.1", "7.2", "7.3", "7.4", "7.5", "7.6", "7.7", "7.8", "7.9"]
+      architectures: ["x86_64", "aarch64"]
+      package_manager: "yum"
+      service_manager: "systemd"
+      python_path: "/usr/bin/python3"
+      min_memory_gb: 2
+      min_disk_gb: 10
+      recommended_memory_gb: 8
+      recommended_disk_gb: 50
+      
+    ubuntu2004:
+      name: "Ubuntu 20.04 LTS"
+      versions: ["20.04"]
+      architectures: ["x86_64", "aarch64"]
+      package_manager: "apt"
+      service_manager: "systemd"
+      python_path: "/usr/bin/python3"
+      min_memory_gb: 2
+      min_disk_gb: 10
+      recommended_memory_gb: 8
+      recommended_disk_gb: 50
+      
+    ubuntu2204:
+      name: "Ubuntu 22.04 LTS"
+      versions: ["22.04"]
+      architectures: ["x86_64", "aarch64"]
+      package_manager: "apt"
+      service_manager: "systemd"
+      python_path: "/usr/bin/python3"
+      min_memory_gb: 2
+      min_disk_gb: 10
+      recommended_memory_gb: 8
+      recommended_disk_gb: 50
+
+  # Service configuration
+  services:
+    universal_forwarder:
+      service_name: "SplunkForwarder"
+      systemd_unit: "SplunkForwarder.service"
+      init_script: "/etc/init.d/splunk"
+      user: "splunk"
+      group: "splunk"
+      home_dir: "/opt/splunkforwarder"
+      config_dir: "/opt/splunkforwarder/etc"
+      log_dir: "/opt/splunkforwarder/var/log"
+      pid_file: "/opt/splunkforwarder/var/run/splunk/splunkd.pid"
+      mgmt_port: 8089
+      web_port: null
+      forwarder_port: 9997
+      
+    enterprise:
+      service_name: "Splunk"
+      systemd_unit: "Splunk.service"
+      init_script: "/etc/init.d/splunk"
+      user: "splunk"
+      group: "splunk"
+      home_dir: "/opt/splunk"
+      config_dir: "/opt/splunk/etc"
+      log_dir: "/opt/splunk/var/log"
+      pid_file: "/opt/splunk/var/run/splunk/splunkd.pid"
+      mgmt_port: 8089
+      web_port: 8000
+      forwarder_port: 9997
+      indexer_port: 8080
+
+  # Upgrade paths
+  upgrade_paths:
+    "9.0.5":
+      can_upgrade_to: ["9.1.2", "9.2.2"]
+      requires_reboot: false
+      migration_required: false
+      
+    "9.1.2":
+      can_upgrade_to: ["9.2.2"]
+      requires_reboot: false
+      migration_required: false
+      
+    "9.2.2":
+      can_upgrade_to: []
+      requires_reboot: false
+      migration_required: false
+
+  # Health check commands
+  health_checks:
+    version:
+      command: "{{ splunk_home }}/bin/splunk version"
+      timeout: 30
+      expected_output: "Splunk {{ target_version }}"
+      
+    status:
+      command: "{{ splunk_home }}/bin/splunk status"
+      timeout: 60
+      expected_output: "splunkd is running"
+      
+    mgmt_port:
+      command: "netstat -tlnp | grep :{{ splunk_mgmt_port }}"
+      timeout: 30
+      expected_output: "LISTEN"
+      
+    web_port:
+      command: "netstat -tlnp | grep :{{ splunk_web_port }}"
+      timeout: 30
+      expected_output: "LISTEN"
+      when: "{{ splunk_type == 'enterprise' }}"
+      
+    forwarder_port:
+      command: "netstat -tlnp | grep :{{ splunk_forwarder_port }}"
+      timeout: 30
+      expected_output: "LISTEN"
+      
+    license:
+      command: "{{ splunk_home }}/bin/splunk show license"
+      timeout: 30
+      expected_output: "License"
+      
+    connectivity:
+      command: "{{ splunk_home }}/bin/splunk list forward-server"
+      timeout: 30
+      expected_output: "server"
+      
+    logs:
+      command: "grep -i error {{ splunk_home }}/var/log/splunk/splunkd.log | tail -10"
+      timeout: 30
+      expected_output: ""
+
+  # Configuration templates
+  config_templates:
+    inputs_conf:
+      path: "{{ splunk_home }}/etc/system/local/inputs.conf"
+      template: |
+        [default]
+        host = {{ inventory_hostname }}
+        
+        [tcp://:9997]
+        disabled = 0
+        
+        [udp://:514]
+        disabled = 0
+        
+    outputs_conf:
+      path: "{{ splunk_home }}/etc/system/local/outputs.conf"
+      template: |
+        [tcpout:default]
+        server = {{ splunk_indexer_hosts | join(',') }}
+        
+        [tcpout:default:server1]
+        server = {{ splunk_indexer_1 }}
+        
+        [tcpout:default:server2]
+        server = {{ splunk_indexer_2 }}
+        
+    server_conf:
+      path: "{{ splunk_home }}/etc/system/local/server.conf"
+      template: |
+        [general]
+        serverName = {{ inventory_hostname }}
+        
+        [license]
+        activeGroup = {{ splunk_license_group }}
+        
+        [clustering]
+        mode = {{ splunk_cluster_mode | default('none') }}
+        master_uri = {{ splunk_cluster_master | default('') }}

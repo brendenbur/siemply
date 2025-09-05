@@ -1,0 +1,255 @@
+# SSH Connection Profiles
+# Defines SSH connection parameters, authentication methods, and security settings
+
+profiles:
+  # Production SSH profile with high security
+  prod:
+    user: splunk
+    port: 22
+    auth_method: key
+    private_key_file: ~/.ssh/splunk_prod
+    public_key_file: ~/.ssh/splunk_prod.pub
+    key_passphrase: null  # Will be retrieved from secrets backend
+    timeout: 30
+    connect_timeout: 10
+    keepalive_interval: 30
+    keepalive_count_max: 3
+    
+    # Security settings
+    ciphers:
+      - aes256-gcm@openssh.com
+      - aes128-gcm@openssh.com
+      - aes256-ctr
+      - aes128-ctr
+    kex_algorithms:
+      - curve25519-sha256
+      - curve25519-sha256@libssh.org
+      - ecdh-sha2-nistp521
+      - ecdh-sha2-nistp384
+    mac_algorithms:
+      - hmac-sha2-256
+      - hmac-sha2-512
+      - hmac-sha1
+    
+    # Host key verification
+    host_key_checking: true
+    known_hosts_file: ~/.ssh/known_hosts
+    strict_host_key_checking: true
+    
+    # Compression
+    compression: true
+    compression_level: 6
+    
+    # Connection multiplexing
+    control_master: auto
+    control_path: ~/.ssh/siemply_%h_%p_%r
+    control_persist: 300
+    
+    # Bastion/Jump host configuration
+    bastion:
+      enabled: false
+      host: null
+      user: null
+      port: 22
+      private_key_file: null
+    
+    # Retry settings
+    retry_attempts: 3
+    retry_delay: 5
+    exponential_backoff: true
+    
+  # Staging SSH profile with moderate security
+  stage:
+    user: splunk
+    port: 22
+    auth_method: key
+    private_key_file: ~/.ssh/splunk_stage
+    public_key_file: ~/.ssh/splunk_stage.pub
+    key_passphrase: null
+    timeout: 20
+    connect_timeout: 5
+    keepalive_interval: 60
+    keepalive_count_max: 2
+    
+    # Security settings (less restrictive than prod)
+    ciphers:
+      - aes256-gcm@openssh.com
+      - aes128-gcm@openssh.com
+      - aes256-ctr
+      - aes128-ctr
+      - aes192-ctr
+    kex_algorithms:
+      - curve25519-sha256
+      - curve25519-sha256@libssh.org
+      - ecdh-sha2-nistp521
+      - ecdh-sha2-nistp384
+      - ecdh-sha2-nistp256
+    mac_algorithms:
+      - hmac-sha2-256
+      - hmac-sha2-512
+      - hmac-sha1
+    
+    # Host key verification
+    host_key_checking: true
+    known_hosts_file: ~/.ssh/known_hosts
+    strict_host_key_checking: false  # More permissive for staging
+    
+    # Compression
+    compression: true
+    compression_level: 4
+    
+    # Connection multiplexing
+    control_master: auto
+    control_path: ~/.ssh/siemply_stage_%h_%p_%r
+    control_persist: 180
+    
+    # Bastion/Jump host configuration
+    bastion:
+      enabled: false
+      host: null
+      user: null
+      port: 22
+      private_key_file: null
+    
+    # Retry settings
+    retry_attempts: 2
+    retry_delay: 3
+    exponential_backoff: true
+    
+  # Development SSH profile with basic security
+  dev:
+    user: splunk
+    port: 22
+    auth_method: key
+    private_key_file: ~/.ssh/splunk_dev
+    public_key_file: ~/.ssh/splunk_dev.pub
+    key_passphrase: null
+    timeout: 15
+    connect_timeout: 5
+    keepalive_interval: 120
+    keepalive_count_max: 1
+    
+    # Security settings (basic)
+    ciphers:
+      - aes256-ctr
+      - aes128-ctr
+      - aes192-ctr
+    kex_algorithms:
+      - ecdh-sha2-nistp521
+      - ecdh-sha2-nistp384
+      - ecdh-sha2-nistp256
+    mac_algorithms:
+      - hmac-sha2-256
+      - hmac-sha1
+    
+    # Host key verification (permissive for dev)
+    host_key_checking: false
+    known_hosts_file: /dev/null
+    strict_host_key_checking: false
+    
+    # Compression
+    compression: false
+    
+    # Connection multiplexing
+    control_master: false
+    control_path: null
+    control_persist: 0
+    
+    # Bastion/Jump host configuration
+    bastion:
+      enabled: false
+      host: null
+      user: null
+      port: 22
+      private_key_file: null
+    
+    # Retry settings
+    retry_attempts: 1
+    retry_delay: 2
+    exponential_backoff: false
+    
+  # Emergency SSH profile for troubleshooting
+  emergency:
+    user: root
+    port: 22
+    auth_method: key
+    private_key_file: ~/.ssh/emergency
+    public_key_file: ~/.ssh/emergency.pub
+    key_passphrase: null
+    timeout: 60
+    connect_timeout: 30
+    keepalive_interval: 30
+    keepalive_count_max: 5
+    
+    # Security settings (maximum compatibility)
+    ciphers:
+      - aes256-ctr
+      - aes128-ctr
+      - aes192-ctr
+      - 3des-cbc
+    kex_algorithms:
+      - diffie-hellman-group14-sha256
+      - diffie-hellman-group14-sha1
+      - diffie-hellman-group1-sha1
+    mac_algorithms:
+      - hmac-sha2-256
+      - hmac-sha1
+      - hmac-md5
+    
+    # Host key verification (disabled for emergency access)
+    host_key_checking: false
+    known_hosts_file: /dev/null
+    strict_host_key_checking: false
+    
+    # Compression
+    compression: false
+    
+    # Connection multiplexing (disabled for reliability)
+    control_master: false
+    control_path: null
+    control_persist: 0
+    
+    # Bastion/Jump host configuration
+    bastion:
+      enabled: false
+      host: null
+      user: null
+      port: 22
+      private_key_file: null
+    
+    # Retry settings
+    retry_attempts: 5
+    retry_delay: 10
+    exponential_backoff: true
+
+# Default profile selection based on environment
+default_profiles:
+  prod: prod
+  stage: stage
+  dev: dev
+  emergency: emergency
+
+# Global SSH settings
+global:
+  # Connection pooling
+  max_connections_per_host: 5
+  connection_pool_timeout: 300
+  
+  # Logging
+  log_level: INFO
+  log_ssh_commands: false
+  log_ssh_output: false
+  
+  # Performance tuning
+  tcp_keepalive: true
+  tcp_keepalive_idle: 60
+  tcp_keepalive_interval: 30
+  tcp_keepalive_count: 3
+  
+  # Security defaults
+  preferred_authentications: "publickey,password"
+  password_authentication: false
+  challenge_response_authentication: false
+  gssapi_authentication: false
+  gssapi_key_exchange: false
+  gssapi_delegate_credentials: false
