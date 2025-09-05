@@ -2,8 +2,8 @@
 Playbook YAML schema validation
 """
 import yaml
-from typing import Dict, List, Any, Optional
-from pydantic import BaseModel, Field, validator
+from typing import Dict, List, Any, Optional, Tuple
+from pydantic import BaseModel, Field, field_validator
 
 
 class PlaybookTask(BaseModel):
@@ -23,22 +23,25 @@ class PlaybookTask(BaseModel):
     # Template-specific fields
     vars: Optional[Dict[str, Any]] = Field(None, description="Template variables")
     
-    @validator('type')
+    @field_validator('type')
+    @classmethod
     def validate_task_type(cls, v):
         allowed_types = ['command', 'copy', 'template']
         if v not in allowed_types:
             raise ValueError(f'Task type must be one of: {allowed_types}')
         return v
     
-    @validator('cmd')
-    def validate_command_fields(cls, v, values):
-        if values.get('type') == 'command' and not v:
+    @field_validator('cmd')
+    @classmethod
+    def validate_command_fields(cls, v, info):
+        if info.data.get('type') == 'command' and not v:
             raise ValueError('Command tasks must have a cmd field')
         return v
     
-    @validator('src', 'dest')
-    def validate_file_fields(cls, v, values):
-        task_type = values.get('type')
+    @field_validator('src', 'dest')
+    @classmethod
+    def validate_file_fields(cls, v, info):
+        task_type = info.data.get('type')
         if task_type in ['copy', 'template'] and not v:
             raise ValueError(f'{task_type} tasks must have src and dest fields')
         return v
@@ -49,7 +52,8 @@ class PlaybookSchema(BaseModel):
     description: Optional[str] = Field(None, description="Playbook description")
     tasks: List[PlaybookTask] = Field(..., description="List of tasks to execute")
     
-    @validator('tasks')
+    @field_validator('tasks')
+    @classmethod
     def validate_tasks_not_empty(cls, v):
         if not v:
             raise ValueError('Playbook must have at least one task')

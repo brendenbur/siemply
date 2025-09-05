@@ -20,7 +20,7 @@ class HostCreate(BaseModel):
     ip: str = Field(..., min_length=1, max_length=45)
     port: int = Field(22, ge=1, le=65535)
     username: str = Field(..., min_length=1, max_length=100)
-    auth_type: str = Field(..., regex="^(key|password)$")
+    auth_type: str = Field(..., pattern="^(key|password)$")
     private_key: Optional[str] = None
     private_key_passphrase: Optional[str] = None
     password: Optional[str] = None
@@ -32,7 +32,7 @@ class HostUpdate(BaseModel):
     ip: Optional[str] = Field(None, min_length=1, max_length=45)
     port: Optional[int] = Field(None, ge=1, le=65535)
     username: Optional[str] = Field(None, min_length=1, max_length=100)
-    auth_type: Optional[str] = Field(None, regex="^(key|password)$")
+    auth_type: Optional[str] = Field(None, pattern="^(key|password)$")
     private_key: Optional[str] = None
     private_key_passphrase: Optional[str] = None
     password: Optional[str] = None

@@ -3,6 +3,7 @@ Playbook execution engine
 """
 import asyncio
 import uuid
+import yaml
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -52,7 +53,7 @@ class PlaybookExecutor:
         
         try:
             # Parse playbook YAML
-            playbook_schema = PlaybookSchema.parse_obj(yaml.safe_load(playbook.yaml_content))
+            playbook_schema = PlaybookSchema.model_validate(yaml.safe_load(playbook.yaml_content))
             
             # Execute tasks on all hosts
             self._execute_tasks_on_hosts(run, hosts, playbook_schema.tasks)
