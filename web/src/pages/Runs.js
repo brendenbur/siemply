@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { Play, Plus, RefreshCw, Eye, Download } from 'lucide-react';
+import { Play, Plus, RefreshCw, Eye, Download, X } from 'lucide-react';
 import { RunsTable } from '../components/RunsTable';
 import { RunForm } from '../components/RunForm';
 import { api, apiHelpers } from '../services/api';

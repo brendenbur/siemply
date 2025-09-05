@@ -1,7 +1,7 @@
 import React from 'react';
-import { Play, CheckCircle, XCircle, Clock, Pause } from 'lucide-react';
+import { Play, CheckCircle, XCircle, Clock, Pause, Eye, Download, X } from 'lucide-react';
 
-export function RunsTable({ runs }) {
+export function RunsTable({ runs, onView, onCancel, onDownload }) {
   if (!runs || runs.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
@@ -63,6 +63,7 @@ export function RunsTable({ runs }) {
             <th className="table-header-cell">Hosts</th>
             <th className="table-header-cell">Duration</th>
             <th className="table-header-cell">Started</th>
+            <th className="table-header-cell">Actions</th>
           </tr>
         </thead>
         <tbody className="table-body">
@@ -93,6 +94,37 @@ export function RunsTable({ runs }) {
               </td>
               <td className="table-cell text-gray-500">
                 {formatDate(run.start_time)}
+              </td>
+              <td className="table-cell">
+                <div className="flex space-x-2">
+                  {onView && (
+                    <button
+                      onClick={() => onView(run)}
+                      className="text-blue-600 hover:text-blue-800"
+                      title="View Details"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </button>
+                  )}
+                  {onDownload && (
+                    <button
+                      onClick={() => onDownload(run.run_id)}
+                      className="text-green-600 hover:text-green-800"
+                      title="Download Report"
+                    >
+                      <Download className="h-4 w-4" />
+                    </button>
+                  )}
+                  {run.status === 'running' && onCancel && (
+                    <button
+                      onClick={() => onCancel(run.run_id)}
+                      className="text-red-600 hover:text-red-800"
+                      title="Cancel Run"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
               </td>
             </tr>
           ))}

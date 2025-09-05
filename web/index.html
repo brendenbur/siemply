@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Siemply Web Interface - Splunk Infrastructure Orchestration Dashboard" />
+    
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <title>Siemply - Splunk Infrastructure Orchestration</title>
+    
+    <style>
+      body { font-family: 'Inter', system-ui, sans-serif; }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <div id="root">
+      <!-- Navigation -->
+      <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between h-16">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 flex items-center">
+                <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                <span class="ml-2 text-xl font-bold text-gray-900">Siemply</span>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <div class="flex items-center text-green-600">
+                <svg class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-sm font-medium">Connected</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main Content -->
+      <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900">Siemply Dashboard</h1>
+          <p class="mt-2 text-gray-600">Splunk Infrastructure Orchestration Framework</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+          <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
+                    <svg class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm8 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1v-2z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Total Hosts</dt>
+                    <dd class="text-lg font-medium text-gray-900" id="total-hosts">-</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center">
+                    <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Healthy Hosts</dt>
+                    <dd class="text-lg font-medium text-gray-900" id="healthy-hosts">-</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="w-8 h-8 bg-purple-100 rounded-md flex items-center justify-center">
+                    <svg class="h-5 w-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Active Runs</dt>
+                    <dd class="text-lg font-medium text-gray-900" id="active-runs">-</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="w-8 h-8 bg-red-100 rounded-md flex items-center justify-center">
+                    <svg class="h-5 w-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Failed Hosts</dt>
+                    <dd class="text-lg font-medium text-gray-900" id="failed-hosts">-</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white shadow rounded-lg mb-8">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Quick Actions</h3>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <button onclick="loadHosts()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <svg class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm8 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1v-2z" clip-rule="evenodd"></path>
+                </svg>
+                View Hosts
+              </button>
+              <button onclick="loadRuns()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                <svg class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                </svg>
+                View Runs
+              </button>
+              <button onclick="loadHealth()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                <svg class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                Check Health
+              </button>
+              <button onclick="loadAudit()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                <svg class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                </svg>
+                View Audit
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content Area -->
+        <div id="content" class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <div class="text-center py-8">
+              <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+              <h3 class="mt-2 text-sm font-medium text-gray-900">Welcome to Siemply</h3>
+              <p class="mt-1 text-sm text-gray-500">Select an action above to get started with managing your Splunk infrastructure.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // API Base URL
+      const API_BASE = window.location.origin;
+
+      // Load system health data
+      async function loadSystemHealth() {
+        try {
+          const response = await fetch(`${API_BASE}/api/health/`);
+          const data = await response.json();
+          
+          document.getElementById('total-hosts').textContent = data.summary?.total_hosts || 0;
+          document.getElementById('healthy-hosts').textContent = data.summary?.healthy_hosts || 0;
+          document.getElementById('failed-hosts').textContent = data.summary?.unhealthy_hosts || 0;
+        } catch (error) {
+          console.error('Failed to load system health:', error);
+        }
+      }
+
+      // Load hosts
+      async function loadHosts() {
+        try {
+          const response = await fetch(`${API_BASE}/api/hosts/`);
+          const hosts = await response.json();
+          
+          const content = document.getElementById('content');
+          content.innerHTML = `
+            <div class="px-4 py-5 sm:p-6">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">Hosts (${hosts.length})</h3>
+              <div class="overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Host</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">OS</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    ${hosts.map(host => `
+                      <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${host.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${host.ip}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${host.splunk_type || 'Unknown'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${host.os_family} ${host.os_version}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            ${host.status || 'Unknown'}
+                          </span>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        } catch (error) {
+          console.error('Failed to load hosts:', error);
+          document.getElementById('content').innerHTML = `
+            <div class="px-4 py-5 sm:p-6">
+              <div class="text-center text-red-600">Failed to load hosts: ${error.message}</div>
+            </div>
+          `;
+        }
+      }
+
+      // Load runs
+      async function loadRuns() {
+        try {
+          const response = await fetch(`${API_BASE}/api/runs/`);
+          const runs = await response.json();
+          
+          const content = document.getElementById('content');
+          content.innerHTML = `
+            <div class="px-4 py-5 sm:p-6">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">Runs (${runs.length})</h3>
+              <div class="overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Run ID</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hosts</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Started</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    ${runs.map(run => `
+                      <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">${run.run_id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            run.status === 'completed' ? 'bg-green-100 text-green-800' :
+                            run.status === 'running' ? 'bg-blue-100 text-blue-800' :
+                            run.status === 'failed' ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
+                          }">
+                            ${run.status}
+                          </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${run.total_hosts || 0}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${run.duration ? run.duration.toFixed(1) + 's' : '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${run.start_time ? new Date(run.start_time).toLocaleString() : '-'}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        } catch (error) {
+          console.error('Failed to load runs:', error);
+          document.getElementById('content').innerHTML = `
+            <div class="px-4 py-5 sm:p-6">
+              <div class="text-center text-red-600">Failed to load runs: ${error.message}</div>
+            </div>
+          `;
+        }
+      }
+
+      // Load health
+      async function loadHealth() {
+        try {
+          const response = await fetch(`${API_BASE}/api/health/`);
+          const health = await response.json();
+          
+          const content = document.getElementById('content');
+          content.innerHTML = `
+            <div class="px-4 py-5 sm:p-6">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">System Health</h3>
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-green-600">${health.summary?.healthy_hosts || 0}</div>
+                  <div class="text-sm text-gray-500">Healthy</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-yellow-600">${health.summary?.warning_hosts || 0}</div>
+                  <div class="text-sm text-gray-500">Warning</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-red-600">${health.summary?.unhealthy_hosts || 0}</div>
+                  <div class="text-sm text-gray-500">Unhealthy</div>
+                </div>
+              </div>
+              <div class="overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Host</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Check</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    ${health.hosts?.map(host => `
+                      <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${host.host}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            host.overall_status === 'healthy' ? 'bg-green-100 text-green-800' :
+                            host.overall_status === 'warning' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-red-100 text-red-800'
+                          }">
+                            ${host.overall_status}
+                          </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${host.last_check ? new Date(host.last_check).toLocaleString() : '-'}</td>
+                      </tr>
+                    `).join('') || '<tr><td colspan="3" class="px-6 py-4 text-center text-gray-500">No host data available</td></tr>'}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        } catch (error) {
+          console.error('Failed to load health:', error);
+          document.getElementById('content').innerHTML = `
+            <div class="px-4 py-5 sm:p-6">
+              <div class="text-center text-red-600">Failed to load health data: ${error.message}</div>
+            </div>
+          `;
+        }
+      }
+
+      // Load audit
+      async function loadAudit() {
+        try {
+          const response = await fetch(`${API_BASE}/api/audit/events?limit=20`);
+          const events = await response.json();
+          
+          const content = document.getElementById('content');
+          content.innerHTML = `
+            <div class="px-4 py-5 sm:p-6">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Audit Events (${events.length})</h3>
+              <div class="overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event Type</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Host</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    ${events.map(event => `
+                      <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(event.timestamp).toLocaleString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${event.event_type}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${event.user}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${event.host}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${event.action}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            event.status === 'success' ? 'bg-green-100 text-green-800' :
+                            event.status === 'failed' ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
+                          }">
+                            ${event.status}
+                          </span>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        } catch (error) {
+          console.error('Failed to load audit:', error);
+          document.getElementById('content').innerHTML = `
+            <div class="px-4 py-5 sm:p-6">
+              <div class="text-center text-red-600">Failed to load audit events: ${error.message}</div>
+            </div>
+          `;
+        }
+      }
+
+      // Load system health on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        loadSystemHealth();
+      });
+    </script>
+  </body>
+</html>
