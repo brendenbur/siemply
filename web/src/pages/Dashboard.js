@@ -4,11 +4,7 @@ import {
   Server, 
   Play, 
   CheckCircle, 
-  XCircle, 
-  AlertTriangle,
-  Activity,
-  Clock,
-  Users
+  XCircle
 } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
 import { HostsTable } from '../components/HostsTable';

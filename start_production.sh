@@ -1,10 +1,10 @@
 #!/bin/bash
-# Siemply Web Interface Startup Script
+# Siemply Production Web Interface Startup Script
 
 set -e
 
-echo "🚀 Starting Siemply Web Interface"
-echo "=================================="
+echo "🚀 Starting Siemply Production Web Interface"
+echo "============================================="
 
 # Check if we're in the right directory
 if [ ! -f "src/siemply/api/main.py" ]; then
@@ -24,38 +24,30 @@ fi
 
 echo "✅ Python version $python_version is compatible"
 
-# Install/update dependencies
-echo "📦 Installing/updating dependencies..."
-pip install -e .
-
-# Check if web directory exists
-if [ ! -d "web" ]; then
-    echo "❌ Error: Web directory not found. Please ensure the web interface is built."
-    exit 1
+# Check if virtual environment exists
+if [ -d "venv" ]; then
+    echo "🔧 Activating virtual environment..."
+    source venv/bin/activate
+else
+    echo "⚠️  Virtual environment not found. Using system Python..."
 fi
 
-# Check if web is built
-if [ ! -f "web/build/index.html" ]; then
-    echo "⚠️  Web interface not built. Building now..."
-    cd web
-    npm install
-    npm run build
-    cd ..
+# Install/update dependencies
+echo "📦 Installing/updating dependencies..."
+pip install -e . > /dev/null 2>&1
+
+# Check if web build exists
+if [ -d "web/build" ]; then
+    echo "✅ React build found"
+else
+    echo "⚠️  React build not found. Using HTML fallback interface."
+    echo "   To build React interface, install Node.js and run:"
+    echo "   cd web && npm install && npm run build"
 fi
 
 # Set environment variables
 export SIEMPLY_CONFIG_DIR="${SIEMPLY_CONFIG_DIR:-./config}"
 export SIEMPLY_LOG_LEVEL="${SIEMPLY_LOG_LEVEL:-INFO}"
-
-# Activate virtual environment
-echo "🔧 Activating virtual environment..."
-if [ -f "venv/bin/activate" ]; then
-    source venv/bin/activate
-elif [ -f "venv/Scripts/activate" ]; then
-    source venv/Scripts/activate
-else
-    echo "⚠️  Virtual environment not found. Using system Python..."
-fi
 
 # Start the web server
 echo "🌐 Starting FastAPI server..."
@@ -68,5 +60,4 @@ echo ""
 uvicorn siemply.api.main:app \
     --host 0.0.0.0 \
     --port 8000 \
-    --reload \
     --log-level info

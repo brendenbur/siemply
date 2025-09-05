@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Save, RefreshCw, TestTube, Database, Key, Wifi } from 'lucide-react';
+import { Save, RefreshCw, TestTube } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export function Settings() {
